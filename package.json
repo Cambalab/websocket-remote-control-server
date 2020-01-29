@@ -1,31 +1,28 @@
 {
   "name": "websocket-remote-control-server",
-  "version": "1.0.0",
-  "description": "## Estructura:",
-  "main": "app.js",
+  "version": "0.0.0",
+  "description": "Server-side of Websocket-remote-control, a library to link two devices and exchange info.",
+  "main": "./index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "echo \"Error: no start specified\" && exit 1",
-    "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production"
+    "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
+    "prepublish": "npm run build",
+    "publish": "git push origin --tags && git push origin",
+    "release:major": "npm version major && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:patch": "npm version patch && npm publish"
   },
   "repository": {
     "type": "git",
-    "url": "https://recursos.camba.coop/camba/websocket-remote-control.git"
+    "url": "https://github.com/Cambalab/websocket-remote-control-server"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Camba <info@camba.coop>",
+  "homepage": "https://github.com/Cambalab/websocket-remote-control-server/blob/develop/README.md",
+  "bugs": {
+    "url": "https://github.com/Cambalab/websocket-remote-control-server/issues"
+  },
+  "license": "GPL-3.0",
   "dependencies": {
     "socket.io": "^2.3.0"
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/env",
-        {
-          "modules": false
-        }
-      ]
-    ]
   },
   "devDependencies": {
     "@babel/core": "^7.8.3",
@@ -39,5 +36,15 @@
     "eslint-plugin-standard": "^4.0.1",
     "rollup": "^1.29.1",
     "rollup-plugin-babel": "^4.3.3"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/env",
+        {
+          "modules": false
+        }
+      ]
+    ]
   }
 }
