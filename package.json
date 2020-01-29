@@ -4,6 +4,7 @@
   "description": "Server-side of Websocket-remote-control, a library to link two devices and exchange info.",
   "main": "./index.js",
   "scripts": {
+    "lint": "./node_modules/.bin/eslint",
     "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
     "prepublish": "npm run build",
     "publish": "git push origin --tags && git push origin",
