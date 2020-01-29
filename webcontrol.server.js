@@ -7,14 +7,9 @@ class WebControlServer {
     this.io.on('connection', function (socket) {
       socket.on('linkController', linkController)
       socket.on('alreadyLinked', alreadyLinked)
-      socket.on('url', url)
       socket.on('getSpecialNumber', createScreenSession)
       socket.on('data', processData)
     })
-
-    const url = (url, destinationSocketId) => {
-      this.url(url, destinationSocketId)
-    }
 
     const linkController = (specialNumber, socketId) => {
       this.linkController(specialNumber, socketId)
