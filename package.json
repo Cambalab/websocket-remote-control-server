@@ -2,7 +2,7 @@
   "name": "websocket-remote-control-server",
   "version": "0.0.2",
   "description": "Server-side of Websocket-remote-control, a library to link two devices and exchange info.",
-  "main": "./index.js",
+  "main": "index.js",
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
     "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
