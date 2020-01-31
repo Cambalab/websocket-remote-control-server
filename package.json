@@ -1,6 +1,6 @@
 {
   "name": "websocket-remote-control-server",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Server-side of Websocket-remote-control, a library to link two devices and exchange info.",
   "main": "./index.js",
   "scripts": {
