@@ -21,7 +21,7 @@ In the `/demo` folder of the [client](https://github.com/Cambalab/websocket-remo
 After installing the library:
 
 Create and run a web server. You can use [Express](https://expressjs.com) following our 
-[example](link-to-example).
+example.
 
 Require the `websockets-remote-control-server` and initialize it:
 
