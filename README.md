@@ -31,7 +31,7 @@ Require the `websockets-remote-control-server` and initialize it:
 let WebControlServer = require('websocket-remote-control-server');
 let webcontrol = new WebControlServer(server);
 ```
-And done! Now, you should install and use the [client library] to be able to listen and answer to the previously listed events.
+And done! Now, you should install and use the [Client](https://github.com/Cambalab/websocket-remote-control-client) to be able to listen and answer to the previously listed events.
 
 ### How it works
 
