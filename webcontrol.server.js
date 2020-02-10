@@ -9,6 +9,7 @@ class WebControlServer {
       socket.on('alreadyLinked', alreadyLinked)
       socket.on('getSpecialNumber', createScreenSession)
       socket.on('data', processData)
+      socket.on('unpair', unpair)
     })
 
     const linkController = (specialNumber, socketId) => {
@@ -25,6 +26,10 @@ class WebControlServer {
 
     const processData = (data, originSocketId, specialNumber) => {
       this.processData(data, originSocketId, specialNumber)
+    }
+
+    const unpair = (specialNumber, socketId) => {
+      this.unpair(specialNumber, socketId)
     }
   }
 
@@ -192,6 +197,10 @@ class WebControlServer {
   updateControlId (control, id, socketId) {
     control[id] = socketId
     return control
+  }
+
+  unpair (specialNumber, socketId) {
+    return true
   }
 }
 
