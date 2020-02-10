@@ -104,6 +104,8 @@ class WebControlServer {
     console.log('controllerClients', this.controllerClients)
   }
 
+  //  Generic helper functions
+
   isIncluded (attribute, value, collection) {
     return collection.some((obj) => {
       return obj[attribute] === value
@@ -115,6 +117,11 @@ class WebControlServer {
       return obj[attribute] === value
     })
   }
+
+  removeBy (collection, attribute, value) {
+    return collection.filter(obj => obj[attribute] !== value)
+  }
+  //
 
   clientHad (specialNumber) {
     return this.isIncluded('specialNumber', specialNumber, this.screenClients)
@@ -189,6 +196,7 @@ class WebControlServer {
     this.sendData(client, socketId)
   }
 
+  // TODO: refactor as removeInvalidScreen
   removeInvalidClient (storedSpecialNumber) {
     if (this.invalidSession(storedSpecialNumber)) {
       this.screenClients = this.screenClients.filter(client => client.specialNumber !== storedSpecialNumber)
@@ -207,7 +215,13 @@ class WebControlServer {
   }
 
   unpair (specialNumber, socketId) {
-    return true
+    this.unpairScreen(specialNumber)
+    this.unpaiController(specialNumber)
+  }
+
+  unpairScreen (specialNumber) {
+    const client = this.getClientBySpecialNumber(specialNumber)
+    if (client) {}
   }
 }
 
