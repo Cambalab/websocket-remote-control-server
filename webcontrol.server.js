@@ -82,6 +82,7 @@ class WebControlServer {
     if (!clientWithSpecialNumber || this.invalidSession(storedSpecialNumber)) {
       // new screen client
       this.removeInvalidClient(storedSpecialNumber)
+      this.removeInvalidController(storedSpecialNumber)
       this.createClient(socketId)
     } else {
       // client already exists
@@ -191,6 +192,12 @@ class WebControlServer {
   removeInvalidClient (storedSpecialNumber) {
     if (this.invalidSession(storedSpecialNumber)) {
       this.screenClients = this.screenClients.filter(client => client.specialNumber !== storedSpecialNumber)
+    }
+  }
+
+  removeInvalidController (storedSpecialNumber) {
+    if (this.invalidSession(storedSpecialNumber)) {
+      this.controllerClients = this.controllerClients.filter(controller => controller.specialNumber !== storedSpecialNumber)
     }
   }
 
