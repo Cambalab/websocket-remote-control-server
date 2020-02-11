@@ -215,15 +215,16 @@ class WebControlServer {
   }
 
   unpair (specialNumber, socketId) {
-    this.unpairClient(this.getControllerBySpecialNumber(specialNumber),
-      this.controllerClients, specialNumber)
+    this.unpairControllerClient(this.getControllerBySpecialNumber(specialNumber),
+      specialNumber)
     // controllerSocketId
     this.io.to(`${socketId}`).emit('linkController', 'error')
   }
 
-  unpairClient (client, collection, specialNumber) {
+  unpairControllerClient (client, specialNumber) {
     if (client) {
-      collection = this.removeBy(collection, 'specialNumber', specialNumber)
+      var clients = this.removeBy(this.controllerClients, 'specialNumber', specialNumber)
+      this.controllerClients = clients
     }
   }
 }
