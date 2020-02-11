@@ -218,7 +218,7 @@ class WebControlServer {
     this.unpairControllerClient(this.getControllerBySpecialNumber(specialNumber),
       specialNumber)
     // controllerSocketId
-    this.io.to(`${socketId}`).emit('linkController', 'error')
+    this.io.to(`${socketId}`).emit('unpairController')
   }
 
   unpairControllerClient (client, specialNumber) {
