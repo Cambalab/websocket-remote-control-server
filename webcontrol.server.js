@@ -39,7 +39,7 @@ class WebControlServer {
   }
 
   processData (data, originSocketId, specialNumber) {
-    if (this.clientHad(specialNumber) && this.isUrl(data)) {
+    if (this.screenHas(specialNumber) && this.isUrl(data)) {
       const destinationSocketId = this.getClientBySpecialNumber(specialNumber).id
       this.io.to(`${destinationSocketId}`).emit('urlRedirect', data)
     } else {
@@ -57,7 +57,7 @@ class WebControlServer {
   }
 
   alreadyLinked (specialNumber, socketId) {
-    if (this.clientHad(specialNumber)) {
+    if (this.screenHas(specialNumber)) {
       this.updateController(specialNumber, socketId)
       this.io.to(`${socketId}`).emit('alreadyLinked', true)
     } else {
@@ -66,7 +66,7 @@ class WebControlServer {
   }
 
   linkController (specialNumber, socketId) {
-    if (this.clientHad(specialNumber)) {
+    if (this.screenHas(specialNumber)) {
       const clientSocketId = this.getClient(specialNumber)
       this.storeControllerClient(specialNumber, socketId, clientSocketId)
       this.io.to(`${socketId}`).emit('linkController', {
@@ -123,7 +123,7 @@ class WebControlServer {
   }
   //
 
-  clientHad (specialNumber) {
+  screenHas (specialNumber) {
     return this.isIncluded('specialNumber', specialNumber, this.screenClients)
   }
 
