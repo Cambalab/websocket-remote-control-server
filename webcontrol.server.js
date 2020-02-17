@@ -1,9 +1,9 @@
 class WebControlServer {
-  constructor (server) {
+  constructor (server, durationInHours = 1) {
     this.io = require('socket.io')(server)
     this.screenClients = []
     this.controllerClients = []
-    this.sessionDurationInHours = 1
+    this.sessionDurationInHours = durationInHours
     this.io.on('connection', function (socket) {
       socket.on('linkController', linkController)
       socket.on('alreadyLinked', alreadyLinked)
@@ -58,6 +58,7 @@ class WebControlServer {
 
   alreadyLinked (specialNumber, socketId) {
     if (this.clientHad(specialNumber)) {
+      this.updateController(specialNumber, socketId)
       this.io.to(`${socketId}`).emit('alreadyLinked', true)
     } else {
       this.io.to(`${socketId}`).emit('alreadyLinked', false)
@@ -82,7 +83,7 @@ class WebControlServer {
     if (!clientWithSpecialNumber || this.invalidSession(storedSpecialNumber)) {
       // new screen client
       this.removeInvalidClient(storedSpecialNumber)
-      this.removeInvalidController(storedSpecialNumber)
+      this.invalidateControllerSession(storedSpecialNumber)
       this.createClient(socketId)
     } else {
       // client already exists
@@ -101,7 +102,6 @@ class WebControlServer {
       specialNumber: specialNumber
     }
     this.controllerClients.push(reg)
-    console.log('controllerClients', this.controllerClients)
   }
 
   //  Generic helper functions
@@ -165,7 +165,6 @@ class WebControlServer {
   }
 
   sendData (client, socketId) {
-    console.log('sendData', this.screenClients)
     // sending specialNumber to screen client
     this.io.to(`${socketId}`).emit('getSpecialNumber', client)
   }
@@ -225,6 +224,21 @@ class WebControlServer {
     if (client) {
       var clients = this.removeBy(this.controllerClients, 'specialNumber', specialNumber)
       this.controllerClients = clients
+    }
+  }
+
+  invalidateControllerSession (specialNumber) {
+    const controller = this.getControllerBySpecialNumber(specialNumber)
+    if (controller) {
+      this.alreadyLinked(controller.specialNumber, controller.controllerSocketId)
+      this.removeInvalidController(specialNumber)
+    }
+  }
+
+  updateController (specialNumber, socketId) {
+    var controller = this.findBy('specialNumber', specialNumber, this.controllerClients)
+    if (controller) {
+      controller.controllerSocketId = socketId
     }
   }
 }
