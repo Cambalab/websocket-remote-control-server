@@ -1,9 +1,9 @@
 class WebControlServer {
-  constructor (server) {
+  constructor (server, durationInHours = 1) {
     this.io = require('socket.io')(server)
     this.screenClients = []
     this.controllerClients = []
-    this.sessionDurationInHours = 1
+    this.sessionDurationInHours = durationInHours
     this.io.on('connection', function (socket) {
       socket.on('linkController', linkController)
       socket.on('alreadyLinked', alreadyLinked)
