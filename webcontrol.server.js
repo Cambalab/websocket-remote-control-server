@@ -1,22 +1,23 @@
 class WebControlServer {
-  constructor (server) {
+  constructor (server, durationInHours = 1) {
     this.io = require('socket.io')(server)
     this.screenClients = []
     this.controllerClients = []
-    this.sessionDurationInHours = 1
+    this.sessionDurationInHours = durationInHours
     this.io.on('connection', function (socket) {
       socket.on('linkController', linkController)
       socket.on('alreadyLinked', alreadyLinked)
       socket.on('getSpecialNumber', createScreenSession)
       socket.on('data', processData)
+      socket.on('unpair', unpair)
     })
 
-    const linkController = (specialNumber, socketId) => {
-      this.linkController(specialNumber, socketId)
+    const linkController = (specialNumber, socketId, sessionId) => {
+      this.linkController(specialNumber, socketId, sessionId)
     }
 
-    const alreadyLinked = (specialNumber, socketId) => {
-      this.alreadyLinked(specialNumber, socketId)
+    const alreadyLinked = (specialNumber, socketId, sessionId) => {
+      this.alreadyLinked(specialNumber, socketId, sessionId)
     }
 
     const createScreenSession = (socketId, storedSpecialNumber) => {
@@ -26,6 +27,10 @@ class WebControlServer {
     const processData = (data, originSocketId, specialNumber) => {
       this.processData(data, originSocketId, specialNumber)
     }
+
+    const unpair = (specialNumber, socketId) => {
+      this.unpair(specialNumber, socketId)
+    }
   }
 
   url (url, specialNumber) {
@@ -34,7 +39,7 @@ class WebControlServer {
   }
 
   processData (data, originSocketId, specialNumber) {
-    if (this.clientHad(specialNumber) && this.isUrl(data)) {
+    if (this.screenHas(specialNumber) && this.isUrl(data)) {
       const destinationSocketId = this.getClientBySpecialNumber(specialNumber).id
       this.io.to(`${destinationSocketId}`).emit('urlRedirect', data)
     } else {
@@ -51,18 +56,19 @@ class WebControlServer {
     return value.match(regex)
   }
 
-  alreadyLinked (specialNumber, socketId) {
-    if (this.clientHad(specialNumber)) {
+  alreadyLinked (specialNumber, socketId, sessionId) {
+    if (this.screenHas(specialNumber) && this.findController(specialNumber, sessionId)) {
+      this.updateController(specialNumber, socketId, sessionId)
       this.io.to(`${socketId}`).emit('alreadyLinked', true)
     } else {
       this.io.to(`${socketId}`).emit('alreadyLinked', false)
     }
   }
 
-  linkController (specialNumber, socketId) {
-    if (this.clientHad(specialNumber)) {
+  linkController (specialNumber, socketId, sessionId) {
+    if (this.screenHas(specialNumber) && !this.controllerHas(specialNumber)) {
       const clientSocketId = this.getClient(specialNumber)
-      this.storeControllerClient(specialNumber, socketId, clientSocketId)
+      this.storeControllerClient(specialNumber, socketId, clientSocketId, sessionId)
       this.io.to(`${socketId}`).emit('linkController', {
         clientSocketId: clientSocketId,
         specialNumber: specialNumber
@@ -77,6 +83,7 @@ class WebControlServer {
     if (!clientWithSpecialNumber || this.invalidSession(storedSpecialNumber)) {
       // new screen client
       this.removeInvalidClient(storedSpecialNumber)
+      this.invalidateControllerSession(storedSpecialNumber)
       this.createClient(socketId)
     } else {
       // client already exists
@@ -88,15 +95,17 @@ class WebControlServer {
     }
   }
 
-  storeControllerClient (specialNumber, controllerClientSocketId, clientSocketId) {
-    const reg = {
+  storeControllerClient (specialNumber, controllerClientSocketId, clientSocketId, sessionId) {
+    const newController = {
       controllerSocketId: controllerClientSocketId,
       clientSocketId: clientSocketId,
-      specialNumber: specialNumber
+      specialNumber: specialNumber,
+      sessionId: sessionId
     }
-    this.controllerClients.push(reg)
-    console.log('controllerClients', this.controllerClients)
+    this.controllerClients.push(newController)
   }
+
+  //  Generic helper functions
 
   isIncluded (attribute, value, collection) {
     return collection.some((obj) => {
@@ -110,8 +119,17 @@ class WebControlServer {
     })
   }
 
-  clientHad (specialNumber) {
+  removeBy (collection, attribute, value) {
+    return collection.filter(obj => obj[attribute] !== value)
+  }
+  //
+
+  screenHas (specialNumber) {
     return this.isIncluded('specialNumber', specialNumber, this.screenClients)
+  }
+
+  controllerHas (specialNumber) {
+    return this.isIncluded('specialNumber', specialNumber, this.controllerClients)
   }
 
   clientExist (socketId) {
@@ -152,7 +170,6 @@ class WebControlServer {
   }
 
   sendData (client, socketId) {
-    console.log('sendData', this.screenClients)
     // sending specialNumber to screen client
     this.io.to(`${socketId}`).emit('getSpecialNumber', client)
   }
@@ -183,15 +200,57 @@ class WebControlServer {
     this.sendData(client, socketId)
   }
 
+  // TODO: refactor as removeInvalidScreen
   removeInvalidClient (storedSpecialNumber) {
     if (this.invalidSession(storedSpecialNumber)) {
       this.screenClients = this.screenClients.filter(client => client.specialNumber !== storedSpecialNumber)
     }
   }
 
+  removeInvalidController (storedSpecialNumber) {
+    if (this.invalidSession(storedSpecialNumber)) {
+      this.controllerClients = this.controllerClients.filter(controller => controller.specialNumber !== storedSpecialNumber)
+    }
+  }
+
   updateControlId (control, id, socketId) {
     control[id] = socketId
     return control
+  }
+
+  unpair (specialNumber, socketId) {
+    this.unpairControllerClient(this.getControllerBySpecialNumber(specialNumber),
+      specialNumber)
+    // controllerSocketId
+    this.io.to(`${socketId}`).emit('unpairController')
+  }
+
+  unpairControllerClient (client, specialNumber) {
+    if (client) {
+      var clients = this.removeBy(this.controllerClients, 'specialNumber', specialNumber)
+      this.controllerClients = clients
+    }
+  }
+
+  invalidateControllerSession (specialNumber) {
+    const controller = this.getControllerBySpecialNumber(specialNumber)
+    if (controller) {
+      this.alreadyLinked(controller.specialNumber, controller.controllerSocketId, controller.sessionId)
+      this.removeInvalidController(specialNumber)
+    }
+  }
+
+  findController (specialNumber, sessionId) {
+    return this.controllerClients.find((controller) => {
+      return controller.specialNumber === specialNumber && controller.sessionId === sessionId
+    })
+  }
+
+  updateController (specialNumber, socketId, sessionId) {
+    var controller = this.findController(specialNumber, sessionId)
+    if (controller) {
+      controller.controllerSocketId = socketId
+    }
   }
 }
 
