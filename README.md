@@ -44,3 +44,5 @@ When a client connects (through a socket), the server is attentive of the follow
 - `alreadyLinked`: Emits an event alerting the involved sockets that the client which is trying connect is already paired.
 
 - `data`: Validates that the data received is an url and is from an existent client. If the validation is correct, the data is sended to the client.
+
+- `unpair`: Deletes the controller associated with a specific specialNumber from the list of controller clients and notifies the client that the session is no longer valid.
