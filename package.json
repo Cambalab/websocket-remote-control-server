@@ -1,5 +1,5 @@
 {
-  "name": "@camba/websocket-remote-control-server",
+  "name": "websocket-remote-control-server",
   "version": "0.0.3",
   "description": "Server-side of Websocket-remote-control, a library to link two devices and exchange info.",
   "main": "index.js",
@@ -8,9 +8,9 @@
     "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
     "prepublish": "npm run build",
     "publish": "git push origin --tags && git push origin",
-    "release:major": "npm version major && npm publish --access=public",
-    "release:minor": "npm version minor && npm publish --access=public",
-    "release:patch": "npm version patch && npm publish --access=public"
+    "release:major": "npm version major && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:patch": "npm version patch && npm publish"
   },
   "repository": {
     "type": "git",
