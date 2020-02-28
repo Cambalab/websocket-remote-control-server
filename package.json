@@ -1,6 +1,6 @@
 {
   "name": "websocket-remote-control-server",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Server-side of Websocket-remote-control, a library to link two devices and exchange info.",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "url": "https://github.com/Cambalab/websocket-remote-control-server"
   },
   "author": "Camba <info@camba.coop>",
-  "homepage": "https://github.com/Cambalab/websocket-remote-control-server/blob/develop/README.md",
+  "homepage": "https://github.com/Cambalab/websocket-remote-control-server/tree/master",
   "bugs": {
     "url": "https://github.com/Cambalab/websocket-remote-control-server/issues"
   },
